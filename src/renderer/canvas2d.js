@@ -104,11 +104,14 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
     // @TODO:
     // conditional wrapper
+    if(config.noWrap){
+    }
+    else{
+      canvas.style.cssText = shadowCanvas.style.cssText = 'position:absolute;left:0;top:0;';
 
-    canvas.style.cssText = shadowCanvas.style.cssText = 'position:absolute;left:0;top:0;';
-
-    container.style.position = 'relative';
-    container.appendChild(canvas);
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
 
     this._palette = _getColorPalette(config);
     this._templates = {};
