@@ -4,7 +4,7 @@
  * Copyright 2008-2016 Patrick Wied <heatmapjs@patrick-wied.at> - All rights reserved.
  * Dual licensed under MIT and Beerware license 
  *
- * :: 2016-09-05 01:16
+ * :: 2017-06-01 15:15
  */
 ;(function (name, context, factory) {
 
@@ -247,10 +247,10 @@ var Store = (function StoreClosure() {
 })();
 
 var Canvas2dRenderer = (function Canvas2dRendererClosure() {
-
+  var _canvasConstructor = function(){ return document.createElement('canvas');}
   var _getColorPalette = function(config) {
     var gradientConfig = config.gradient || config.defaultGradient;
-    var paletteCanvas = document.createElement('canvas');
+    var paletteCanvas = _canvasConstructor(); 
     var paletteCtx = paletteCanvas.getContext('2d');
 
     paletteCanvas.width = 256;
@@ -258,7 +258,8 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
     var gradient = paletteCtx.createLinearGradient(0, 0, 256, 1);
     for (var key in gradientConfig) {
-      gradient.addColorStop(key, gradientConfig[key]);
+      //keys are strings some canvas implementations will not auto cast
+      gradient.addColorStop(parseFloat(key), gradientConfig[key]);
     }
 
     paletteCtx.fillStyle = gradient;
@@ -268,7 +269,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
   };
 
   var _getPointTemplate = function(radius, blurFactor) {
-    var tplCanvas = document.createElement('canvas');
+    var tplCanvas = _canvasConstructor();
     var tplCtx = tplCanvas.getContext('2d');
     var x = radius;
     var y = radius;
@@ -328,12 +329,18 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
 
   function Canvas2dRenderer(config) {
+    if('canvasConstructor' in config){
+      _canvasConstructor = config.canvasConstructor
+    }
     var container = config.container;
-    var shadowCanvas = this.shadowCanvas = document.createElement('canvas');
-    var canvas = this.canvas = config.canvas || document.createElement('canvas');
+    var shadowCanvas = this.shadowCanvas = _canvasConstructor();
+    var canvas = this.canvas = config.canvas || _canvasConstructor();
     var renderBoundaries = this._renderBoundaries = [10000, 10000, 0, 0];
 
-    var computed = getComputedStyle(config.container) || {};
+    var computed = {};
+    if(!config.width || !config.height){
+      computed = getComputedStyle(config.container);
+    }
 
     canvas.className = 'heatmap-canvas';
 
@@ -345,11 +352,14 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
     // @TODO:
     // conditional wrapper
+    if(config.noWrap){
+    }
+    else{
+      canvas.style.cssText = shadowCanvas.style.cssText = 'position:absolute;left:0;top:0;';
 
-    canvas.style.cssText = shadowCanvas.style.cssText = 'position:absolute;left:0;top:0;';
-
-    container.style.position = 'relative';
-    container.appendChild(canvas);
+      container.style.position = 'relative';
+      container.appendChild(canvas);
+    }
 
     this._palette = _getColorPalette(config);
     this._templates = {};
