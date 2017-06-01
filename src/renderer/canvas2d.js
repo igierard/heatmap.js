@@ -11,7 +11,8 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
     var gradient = paletteCtx.createLinearGradient(0, 0, 256, 1);
     for (var key in gradientConfig) {
-      gradient.addColorStop(key, gradientConfig[key]);
+      //keys are strings some canvas implementations will not auto cast
+      gradient.addColorStop(parseFloat(key), gradientConfig[key]);
     }
 
     paletteCtx.fillStyle = gradient;
