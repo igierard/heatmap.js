@@ -89,7 +89,10 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
     var canvas = this.canvas = config.canvas || _canvasConstructor();
     var renderBoundaries = this._renderBoundaries = [10000, 10000, 0, 0];
 
-    var computed = getComputedStyle(config.container) || {};
+    var computed = {};
+    if(!config.width || !config.height){
+      computed = getComputedStyle(config.container);
+    }
 
     canvas.className = 'heatmap-canvas';
 
