@@ -1,9 +1,9 @@
 
 var Canvas2dRenderer = (function Canvas2dRendererClosure() {
-
+  var _canvasConstructor = function(){ return document.createElement('canvas');}
   var _getColorPalette = function(config) {
     var gradientConfig = config.gradient || config.defaultGradient;
-    var paletteCanvas = document.createElement('canvas');
+    var paletteCanvas = _canvasConstructor(); 
     var paletteCtx = paletteCanvas.getContext('2d');
 
     paletteCanvas.width = 256;
@@ -21,7 +21,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
   };
 
   var _getPointTemplate = function(radius, blurFactor) {
-    var tplCanvas = document.createElement('canvas');
+    var tplCanvas = _canvasConstructor();
     var tplCtx = tplCanvas.getContext('2d');
     var x = radius;
     var y = radius;
@@ -81,9 +81,12 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
 
   function Canvas2dRenderer(config) {
+    if('canvasConstructor' in config){
+      _canvasConstructor = config.canvasConstructor
+    }
     var container = config.container;
-    var shadowCanvas = this.shadowCanvas = document.createElement('canvas');
-    var canvas = this.canvas = config.canvas || document.createElement('canvas');
+    var shadowCanvas = this.shadowCanvas = _canvasConstructor();
+    var canvas = this.canvas = config.canvas || _canvasConstructor();
     var renderBoundaries = this._renderBoundaries = [10000, 10000, 0, 0];
 
     var computed = getComputedStyle(config.container) || {};
